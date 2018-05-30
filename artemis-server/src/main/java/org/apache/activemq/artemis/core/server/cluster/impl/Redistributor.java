@@ -66,6 +66,8 @@ public class Redistributor implements Consumer {
                         final int batchSize) {
       this.queue = queue;
 
+      new Exception ("Redistributor into " + queue).printStackTrace(System.out);
+
       this.sequentialID = storageManager.generateID();
 
       this.storageManager = storageManager;
@@ -139,17 +141,21 @@ public class Redistributor implements Consumer {
    @Override
    public synchronized HandleStatus handle(final MessageReference reference) throws Exception {
       if (!active) {
+         System.out.println("Handle " + this.queue + " is busy");
          return HandleStatus.BUSY;
       } else if (reference.getMessage().getGroupID() != null) {
+         System.out.println("Handle " + this.queue + " no match busy");
          //we shouldn't redistribute with message groups return NO_MATCH so other messages can be delivered
          return HandleStatus.NO_MATCH;
       }
 
+      System.out.println("Handling redist " + reference + " into " + queue);
       final Transaction tx = new TransactionImpl(storageManager);
 
       final Pair<RoutingContext, Message> routingInfo = postOffice.redistribute(reference.getMessage(), queue, tx);
 
       if (routingInfo == null) {
+         new Exception("Nice!!!! it was busy.. nothing to redistribute!").printStackTrace();
          tx.rollback();
          return HandleStatus.BUSY;
       }

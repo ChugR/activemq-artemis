@@ -384,6 +384,8 @@ public class ManagementServiceImpl implements ManagementService {
 
    @Override
    public ICoreMessage handleMessage(Message message) throws Exception {
+
+      new Exception("Receive notification " + message).printStackTrace(System.out);
       message = message.toCore();
       // a reply message is sent with the result stored in the message body.
       CoreMessage reply = new CoreMessage(storageManager.generateID(), 512);
@@ -637,6 +639,7 @@ public class ManagementServiceImpl implements ManagementService {
                          ", notificationEnabled=" + notificationsEnabled +
                          " messagingServerControl=" + messagingServerControl);
       }
+      new Exception("Sending notification:" + notification).printStackTrace(System.out);
       // This needs to be synchronized since we need to ensure notifications are processed in strict sequence
       synchronized (this) {
          if (messagingServerControl != null && notificationsEnabled) {

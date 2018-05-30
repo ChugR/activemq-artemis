@@ -131,6 +131,7 @@ public final class BindingsImpl implements Bindings {
 
    @Override
    public void removeBinding(final Binding binding) {
+      new Exception ("Removing binding " + binding).printStackTrace(System.out);
       if (binding.isExclusive()) {
          exclusiveBindings.remove(binding);
       } else {
@@ -314,7 +315,7 @@ public final class BindingsImpl implements Bindings {
 
    @Override
    public String toString() {
-      return "BindingsImpl [name=" + name + "]";
+      return "BindingsImpl [address=" + name + "]";
    }
 
    /**

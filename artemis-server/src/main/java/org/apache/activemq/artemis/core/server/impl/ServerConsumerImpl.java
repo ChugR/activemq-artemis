@@ -478,6 +478,7 @@ public class ServerConsumerImpl implements ServerConsumer, ReadyListener {
 
    @Override
    public void close(final boolean failed) throws Exception {
+      new Exception("Being closed on queue " + getQueue() + " !!!!").printStackTrace(System.out);
       if (logger.isTraceEnabled()) {
          logger.trace("ServerConsumerImpl::" + this + " being closed with failed=" + failed, new Exception("trace"));
       }

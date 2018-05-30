@@ -214,6 +214,7 @@ public class PostOfficeImpl implements PostOffice, NotificationListener, Binding
 
    @Override
    public void onNotification(final Notification notification) {
+      new Exception("received notification " + notification).printStackTrace(System.out);
       if (!(notification.getType() instanceof CoreNotificationType))
          return;
 
@@ -356,7 +357,7 @@ public class PostOfficeImpl implements PostOffice, NotificationListener, Binding
                SimpleString clusterName = props.getSimpleStringProperty(ManagementHelper.HDR_CLUSTER_NAME);
 
                if (clusterName == null) {
-                  logger.debug("PostOffice notification / CONSUMER_CLOSED: No cluster name");
+                  System.out.println("@@@ PostOffice notification / CONSUMER_CLOSED: No cluster name");
                   return;
                }
 
@@ -365,6 +366,7 @@ public class PostOfficeImpl implements PostOffice, NotificationListener, Binding
                QueueInfo info = queueInfos.get(clusterName);
 
                if (info == null) {
+                  System.out.println("@@@ Could not find clusterName = " + clusterName);
                   return;
                }
 
@@ -376,16 +378,22 @@ public class PostOfficeImpl implements PostOffice, NotificationListener, Binding
                   filterStrings.remove(filterString);
                }
 
+               new Exception("numberOfConsumers = " + info.getNumberOfConsumers()).printStackTrace(System.out);
                if (info.getNumberOfConsumers() == 0) {
                   if (!props.containsProperty(ManagementHelper.HDR_DISTANCE)) {
+                     System.out.println("@@@ consumer closed distance not defined ");
                      logger.debug("PostOffice notification / CONSUMER_CLOSED: HDR_DISTANCE not defined");
                      return;
                   }
 
                   int distance = props.getIntProperty(ManagementHelper.HDR_DISTANCE);
 
+                  System.out.println("@@@ distance = " + distance);
+
                   if (distance == 0) {
                      SimpleString queueName = props.getSimpleStringProperty(ManagementHelper.HDR_ROUTING_NAME);
+
+                     System.out.println("@@@ queueName = " + queueName);
 
                      if (queueName == null) {
                         logger.debug("PostOffice notification / CONSUMER_CLOSED: No queue name");
@@ -393,9 +401,11 @@ public class PostOfficeImpl implements PostOffice, NotificationListener, Binding
                      }
 
                      Binding binding = getBinding(queueName);
+                     System.out.println("@@@ binding = " + binding);
 
                      if (binding == null) {
                         logger.debug("PostOffice notification / CONSUMER_CLOSED: Could not find queue " + queueName);
+                        System.out.println("@@@ PostOffice notification / CONSUMER_CLOSED: Could not find queue " + queueName);
                         return;
                      }
 
@@ -406,6 +416,7 @@ public class PostOfficeImpl implements PostOffice, NotificationListener, Binding
                      long redistributionDelay = addressSettings.getRedistributionDelay();
 
                      if (redistributionDelay != -1) {
+                        System.out.println("@@@ Adding redistributor " + queue + " with delay = " + redistributionDelay);
                         queue.addRedistributor(redistributionDelay);
                      }
                   }

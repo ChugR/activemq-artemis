@@ -538,10 +538,6 @@ public class BridgeImpl implements Bridge, SessionFailureListener, SendAcknowled
          message.putExtraBytesProperty(Message.HDR_BRIDGE_DUPLICATE_ID, bytes);
       }
 
-      if (forwardingAddress != null) {
-         // for AMQP messages this modification will be transient
-         message.setAddress(forwardingAddress);
-      }
 
       if (transformer != null) {
          final Message transformedMessage = transformer.transform(message);
@@ -553,10 +549,20 @@ public class BridgeImpl implements Bridge, SessionFailureListener, SendAcknowled
                                " as transformedMessage");
             }
          }
-         return EmbedMessageUtil.embedAsCoreMessage(transformedMessage);
+         return embedMessage(transformedMessage, forwardingAddress);
       } else {
-         return EmbedMessageUtil.embedAsCoreMessage(message);
+         return embedMessage(message, forwardingAddress);
       }
+   }
+
+   private Message embedMessage(Message message, SimpleString forwardingAddress) {
+      message = EmbedMessageUtil.embedAsCoreMessage(message);
+      if (forwardingAddress != null) {
+         // for AMQP messages this modification will be transient
+         message.setAddress(forwardingAddress);
+      }
+
+      return message;
    }
 
    @Override
