@@ -28,25 +28,30 @@ namespace Amqp.Extensions.Examples
     {
         static void Main(string[] args)
         {
-            //string addr = args.Length;
+            string addr  = args.Length >= 1 ? args[0] : "amqp://10.3.116.118:5672/orders";
+            int sendN = args.Length >= 2 ? Convert.ToInt32(args[1]) : 200;
+            int credit = args.Length >= 3 ? Convert.ToInt32(args[2]) : 20;
+
+            Address address = new Address(addr);
+            string queue = address.Path.Substring(1);
+
             Random rnd = new Random();
 
-            Connection connection = new Connection(new Address("amqp://10.3.116.118:5672"));
+            Connection connection = new Connection(address);
             Session session = new Session(connection);
-            ReceiverLink receiver = new ReceiverLink(session, "receiver", "orders");
+            ReceiverLink receiver = new ReceiverLink(session, "receiver", queue);
 
             // sleep to make sure the queue is created before we send, we could await the attach frame but this is just a demo.
             Thread.Sleep(1000);
 
-            SenderLink sender = new SenderLink(session, "sender", "orders");
+            SenderLink sender = new SenderLink(session, "sender", queue);
             Message message = new Message("a message!");
             message.Header = new Header();
             message.Header.Durable = true;
             OutcomeCallback callback = (l, msg, o, s) => { };
 
-            int N = 200;
-            Console.WriteLine("Sending {0} messages...", N);
-            for (var i = 0; i < N; i++)
+            Console.WriteLine("Sending {0} messages...", sendN);
+            for (var i = 0; i < sendN; i++)
             {
                 sender.Send(message, callback, null);
             }
@@ -88,7 +93,7 @@ namespace Amqp.Extensions.Examples
 #if LITE_MANAGES_CREDIT
             int nIn = 0;
             int nDone = 0;
-            receiver.Start(20, async (r, m) =>
+            receiver.Start(credit, async (r, m) =>
             {
                 nIn++;
                 Console.WriteLine("nIn = {0}, nDone = {1}, InFlight = {2} In receive callback. Starting await...", nIn, nDone, nIn-nDone);
