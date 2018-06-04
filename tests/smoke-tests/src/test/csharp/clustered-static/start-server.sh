@@ -23,8 +23,8 @@ rm -rf ../../../../target/clustered-static-node0/data
 rm -rf ../../../../target/clustered-static-node1/data
 rm -rf ../../../../target/clustered-static-node2/data
 ../../../../target/clustered-static-node0/bin/artemis run | tee server1.log &
-sleep 1
-../../../../target/clustered-static-node1/bin/artemis run | tee server2.log &
-sleep 1
-../../../../target/clustered-static-node2/bin/artemis run | tee server3.log &
-sleep 1
+#sleep 1
+#../../../../target/clustered-static-node1/bin/artemis run | tee server2.log &
+#sleep 1
+#../../../../target/clustered-static-node2/bin/artemis run | tee server3.log &
+#sleep 1

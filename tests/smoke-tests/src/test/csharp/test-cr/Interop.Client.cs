@@ -45,7 +45,7 @@ namespace Amqp.Extensions.Examples
     {
         static void Main(string[] args)
         {
-            string addr  = args.Length >= 1 ? args[0] : "amqp://10.3.116.118:5672/orders";
+            string addr  = args.Length >= 1 ? args[0] : "amqp://127.0.0.1:5672/orders";
             int sendN = args.Length >= 2 ? Convert.ToInt32(args[1]) : 200;
             int credit = args.Length >= 3 ? Convert.ToInt32(args[2]) : 20;
 
@@ -62,21 +62,23 @@ namespace Amqp.Extensions.Examples
             Thread.Sleep(1000);
 
             SenderLink sender = new SenderLink(session, "sender", queue);
-            Message message = new Message("a message!");
-            message.Header = new Header();
-            message.Header.Durable = true;
-            OutcomeCallback callback = (l, msg, o, s) => { };
+           OutcomeCallback callback = (l, msg, o, s) => { };
 
             Console.WriteLine("Sending {0} messages...", sendN);
             for (var i = 0; i < sendN; i++)
             {
+
+                Message message = new Message("a message!" + i);
+                message.Header = new Header();
+                message.Header.Durable = true;
+
                 sender.Send(message, callback, null);
             }
             Console.WriteLine(".... Done sending");
 
-            Trace.TraceLevel = TraceLevel.Verbose | TraceLevel.Error |
-            TraceLevel.Frame | TraceLevel.Information | TraceLevel.Warning;
-            Trace.TraceListener = (l, f, o) => Console.WriteLine(DateTime.Now.ToString("[hh:mm:ss.fff]") + " " + string.Format(f, o));
+            // Trace.TraceLevel = TraceLevel.Verbose | TraceLevel.Error |
+            // TraceLevel.Frame | TraceLevel.Information | TraceLevel.Warning;
+            // Trace.TraceListener = (l, f, o) => Console.WriteLine(DateTime.Now.ToString("[hh:mm:ss.fff]") + " " + string.Format(f, o));
 
             sender.Close();
 
@@ -113,9 +115,10 @@ namespace Amqp.Extensions.Examples
             receiver.Start(credit, async (r, m) =>
             {
                 nIn++;
-                Console.WriteLine("nIn = {0}, nDone = {1}, InFlight = {2} In receive callback. Starting await...", nIn, nDone, nIn-nDone);
+                Console.WriteLine("nIn = {0}, nDone = {1}, InFlight = {2} In receive callback. Starting await... = m=" + m.Body, nIn, nDone, nIn-nDone);
                 double delay = System.Convert.ToDouble(rnd.Next(2, 20));
                 await Task.Delay(TimeSpan.FromSeconds(delay));
+
                 r.Accept(m);
                 nDone++;
                 Console.WriteLine("nIn = {0}, nDone = {1}, InFlight = {2} ... Exiting Task.Delay", nIn, nDone, nIn - nDone);
