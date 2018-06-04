@@ -145,6 +145,9 @@ public class Redistributor implements Consumer {
          return HandleStatus.NO_MATCH;
       }
 
+
+      System.out.println("Handling redistribution " + reference);
+
       final Transaction tx = new TransactionImpl(storageManager);
 
       final Pair<RoutingContext, Message> routingInfo = postOffice.redistribute(reference.getMessage(), queue, tx);

@@ -1650,6 +1650,10 @@
                   <exclude>artemis-native/src/main/c/org_apache_activemq_artemis_jlibaio_LibaioContext.h</exclude>
                   <exclude>**/dependency-reduced-pom.xml</exclude>
 
+                  <!-- dotnet tests will generate these -->
+                  <exclude>**/bin/**</exclude>
+                  <exclude>**/obj/**</exclude>
+
                </excludes>
             </configuration>
             <executions>
